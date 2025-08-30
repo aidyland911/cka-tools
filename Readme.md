@@ -143,6 +143,3 @@ kshell debug
 stern -l app=nginx
 ```
 
----
-
-Do you want me to generate this as a **`README.md` file** and drop it alongside your Dockerfile (so you can just push repo → Docker Hub description)?
