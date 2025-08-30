@@ -54,3 +54,4 @@ if command -v starship >/dev/null 2>&1 && [ -n "$PS1" ]; then
   export STARSHIP_CONFIG="$HOME/.config/starship.toml"
   eval "$(starship init bash)"
 fi
+export PATH="$HOME/.local/bin:$PATH"
