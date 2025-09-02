@@ -42,7 +42,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       figlet lolcat \
     && rm -rf /var/lib/apt/lists/*
 
-
 # ---- tmux 3.4 from builder ----
 COPY --from=tmuxbuilder /tmp/tmux-out/usr/local/bin/tmux /usr/local/bin/tmux
 
