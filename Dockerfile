@@ -33,7 +33,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 # ---- Base runtime packages (single block, cleaned) ----
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      ca-certificates curl gnupg bash-completion \
+      ca-certificates curl wget openssh-client gnupg bash-completion \
       libevent-2.1-7 libevent-core-2.1-7 libtinfo6 \
       vim git jq procps iputils-ping dnsutils traceroute mtr-tiny net-tools \
       figlet lolcat sudo dos2unix \
