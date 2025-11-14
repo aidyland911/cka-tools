@@ -1,3 +1,4 @@
+#!/bin/bash
 # /etc/bashrc.d/10-cka.sh
 # CKA helpers: aliases, completions, and quick functions.
 # Safe if tools are missing; safe to source multiple times.

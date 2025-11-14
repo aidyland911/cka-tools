@@ -20,12 +20,12 @@ LABEL org.opencontainers.image.title="cka-tools" \
       org.opencontainers.image.licenses="MIT"
 
 # ---- Versions (adjust as needed) ----
-ARG KUBECTL_VERSION=v1.30.4
+ARG KUBECTL_VERSION=v1.31.2
 ARG KUBECTX_VERSION=v0.9.5
-ARG HELM_VERSION=v3.15.4
-ARG KUSTOMIZE_VERSION=v5.4.2
+ARG HELM_VERSION=v3.16.1
+ARG KUSTOMIZE_VERSION=v5.5.0
 ARG YQ_VERSION=v4.44.3
-ARG STERN_VERSION=v1.30.0
+ARG STERN_VERSION=v1.31.0
 
 ENV DEBIAN_FRONTEND=noninteractive \
     TZ=Etc/UTC \
@@ -36,8 +36,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       ca-certificates curl wget openssh-client gnupg bash-completion \
       libevent-2.1-7 libevent-core-2.1-7 libtinfo6 \
       vim git jq procps iputils-ping dnsutils traceroute mtr-tiny net-tools \
-      figlet lolcat sudo dos2unix \
+      figlet lolcat sudo dos2unix less tree file \
     && rm -rf /var/lib/apt/lists/*
+
+# ---- Install Figurine (3D hostname banner) ----
+RUN cd /tmp \
+    && wget -q https://github.com/arsham/figurine/releases/download/v1.3.0/figurine_linux_amd64_v1.3.0.tar.gz \
+    && tar -xzf figurine_linux_amd64_v1.3.0.tar.gz \
+    && mv ./deploy/figurine /usr/local/bin/figurine \
+    && chmod +x /usr/local/bin/figurine \
+    && rm -f figurine_linux_amd64_v1.3.0.tar.gz \
+    && echo "Figurine installed successfully"
+
 
 # ---- tmux 3.4 from builder ----
 COPY --from=tmuxbuilder /tmp/tmux-out/usr/local/bin/tmux /usr/local/bin/tmux

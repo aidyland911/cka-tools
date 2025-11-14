@@ -9,3 +9,10 @@ fi
 
 # Always load interactive settings
 [ -r "$HOME/.bashrc" ] && . "$HOME/.bashrc"
+
+# Load container-wide scripts
+if [ -d /etc/bashrc.d ]; then
+  for f in /etc/bashrc.d/*.sh; do
+    [ -r "$f" ] && . "$f"
+  done
+fi
