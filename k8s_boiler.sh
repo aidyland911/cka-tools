@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # k8s_boiler.sh -- bootstrap kubectl shell helpers on a fresh system
-# Supports: Debian/Ubuntu and RHEL 9 based (RHEL, Rocky, Alma, CentOS Stream 9)
+# Supports: Debian/Ubuntu, RHEL 9 based (RHEL, Rocky, Alma, CentOS Stream 9),
+#           and VMware Photon OS
 # Installs: git, curl, bash-completion, kubectl (if missing), kubectx/kubens
 # Appends to ~/.bashrc: k / kctx / kns aliases + completion
 set -euo pipefail
@@ -11,6 +12,10 @@ BASHRC="$TARGET_HOME/.bashrc"
 KUBECTX_DIR="/opt/kubectx"
 MARKER_BEGIN="# >>> k8s_boiler >>>"
 MARKER_END="# <<< k8s_boiler <<<"
+
+# Photon OS often runs as root with no sudo installed
+SUDO=""
+[ "$(id -u)" -ne 0 ] && SUDO="sudo"
 
 # ---------------------------------------------------------------- detect OS
 if [ -f /etc/os-release ]; then
@@ -23,11 +28,14 @@ fi
 install_pkgs() {
   case "$ID" in
     debian|ubuntu)
-      sudo apt-get update -y
-      sudo apt-get install -y git curl bash-completion
+      $SUDO apt-get update -y
+      $SUDO apt-get install -y git curl bash-completion
       ;;
     rhel|rocky|almalinux|centos|ol)
-      sudo dnf install -y git curl bash-completion
+      $SUDO dnf install -y git curl bash-completion
+      ;;
+    photon)
+      $SUDO tdnf install -y git curl bash-completion
       ;;
     *)
       echo "ERROR: unsupported distro: $ID" >&2
@@ -49,18 +57,18 @@ install_kubectl() {
   esac
   ver="$(curl -fsSL https://dl.k8s.io/release/stable.txt)"
   curl -fsSL -o /tmp/kubectl "https://dl.k8s.io/release/${ver}/bin/linux/${arch}/kubectl"
-  sudo install -m 0755 /tmp/kubectl /usr/local/bin/kubectl
+  $SUDO install -m 0755 /tmp/kubectl /usr/local/bin/kubectl
   rm -f /tmp/kubectl
 }
 
 install_kubectx() {
   if [ ! -d "$KUBECTX_DIR" ]; then
-    sudo git clone --depth 1 https://github.com/ahmetb/kubectx "$KUBECTX_DIR"
+    $SUDO git clone --depth 1 https://github.com/ahmetb/kubectx "$KUBECTX_DIR"
   else
     echo "kubectx already present at $KUBECTX_DIR, skipping clone"
   fi
-  sudo ln -sf "$KUBECTX_DIR/kubectx" /usr/local/bin/kubectx
-  sudo ln -sf "$KUBECTX_DIR/kubens"  /usr/local/bin/kubens
+  $SUDO ln -sf "$KUBECTX_DIR/kubectx" /usr/local/bin/kubectx
+  $SUDO ln -sf "$KUBECTX_DIR/kubens"  /usr/local/bin/kubens
 }
 
 append_bashrc() {
@@ -88,7 +96,7 @@ BASHRC_BLOCK
 
 fix_ownership() {
   if [ "$TARGET_USER" != "root" ]; then
-    sudo chown "$TARGET_USER":"$TARGET_USER" "$BASHRC" 2>/dev/null || true
+    $SUDO chown "$TARGET_USER":"$TARGET_USER" "$BASHRC" 2>/dev/null || true
   fi
 }
 
